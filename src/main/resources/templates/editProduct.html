@@ -3,6 +3,7 @@
 <head>
     <title>Edit Product</title>
     <meta charset="UTF-8">
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -51,10 +52,14 @@
             border: 1px solid #ccc;
         }
 
-        button {
-            width: 100%;
+        .actions {
             margin-top: 25px;
-            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        button {
+            padding: 12px 20px;
             background-color: #1e90ff;
             color: white;
             border: none;
@@ -68,12 +73,16 @@
         }
 
         .back-link {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
+            padding: 12px 20px;
+            background-color: #6c757d;
+            color: white;
             text-decoration: none;
-            color: #1e90ff;
+            border-radius: 8px;
             font-weight: bold;
+        }
+
+        .back-link:hover {
+            background-color: #5a6268;
         }
     </style>
 </head>
@@ -91,15 +100,23 @@
             <input type="hidden" th:field="*{productId}" />
 
             <label for="productName">Product Name</label>
-            <input type="text" id="productName" th:field="*{productName}" required />
+            <input type="text"
+                   id="productName"
+                   th:field="*{productName}"
+                   required />
 
             <label for="productQuantity">Quantity</label>
-            <input type="number" id="productQuantity" th:field="*{productQuantity}" min="0" required />
+            <input type="number"
+                   id="productQuantity"
+                   th:field="*{productQuantity}"
+                   min="0"
+                   required />
 
-            <button type="submit">Update Product</button>
+            <div class="actions">
+                <button type="submit">Update</button>
+                <a class="back-link" th:href="@{/product/list}">Back</a>
+            </div>
         </form>
-
-        <a class="back-link" th:href="@{/product/list}">⬅ Back to Product List</a>
     </div>
 </main>
 
