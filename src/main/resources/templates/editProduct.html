@@ -2,20 +2,106 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Edit Product</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #1e90ff;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        main {
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .card {
+            background-color: white;
+            padding: 30px;
+            width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 12px;
+            background-color: #1e90ff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #187bcd;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #1e90ff;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-<h2>Edit Product</h2>
 
-<form th:action="@{/product/edit}" th:object="${product}" method="post">
-    <input type="hidden" th:field="*{productId}" />
+<header>
+    <h1>ADV Shop</h1>
+</header>
 
-    <label>Product Name</label>
-    <input type="text" th:field="*{productName}" />
+<main>
+    <div class="card">
+        <h2>Edit Product</h2>
 
-    <label>Quantity</label>
-    <input type="number" th:field="*{productQuantity}" />
+        <form th:action="@{/product/edit}" th:object="${product}" method="post">
+            <input type="hidden" th:field="*{productId}" />
 
-    <button type="submit">Update</button>
-</form>
+            <label for="productName">Product Name</label>
+            <input type="text" id="productName" th:field="*{productName}" required />
+
+            <label for="productQuantity">Quantity</label>
+            <input type="number" id="productQuantity" th:field="*{productQuantity}" min="0" required />
+
+            <button type="submit">Update Product</button>
+        </form>
+
+        <a class="back-link" th:href="@{/product/list}">⬅ Back to Product List</a>
+    </div>
+</main>
+
 </body>
 </html>

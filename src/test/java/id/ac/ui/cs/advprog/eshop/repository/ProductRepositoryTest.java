@@ -65,7 +65,7 @@ class ProductRepositoryTest {
         assertFalse(iterator.hasNext());
     }
 
-    // ---------- EDIT PRODUCT ----------
+    // EDIT PRODUCT
     @Test
     void testEditProductPositive() {
         Product product = new Product();
@@ -102,7 +102,7 @@ class ProductRepositoryTest {
         assertFalse(iterator.hasNext());
     }
 
-    // ---------- DELETE PRODUCT ----------
+    // DELETE PRODUCT
     @Test
     void testDeleteProductPositive() {
         Product product = new Product();
