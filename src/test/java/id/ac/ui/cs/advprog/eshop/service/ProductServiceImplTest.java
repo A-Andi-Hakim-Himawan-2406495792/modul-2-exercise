@@ -24,6 +24,8 @@ class ProductServiceImplTest {
     @InjectMocks
     private ProductServiceImpl service;
 
+    // ===== CREATE =====
+
     @Test
     void create_shouldReturnSameProduct() {
         Product product = new Product();
@@ -31,8 +33,18 @@ class ProductServiceImplTest {
         Product result = service.create(product);
 
         assertEquals(product, result, "Service should return created product");
+    }
+
+    @Test
+    void create_shouldCallRepository() {
+        Product product = new Product();
+
+        service.create(product);
+
         Mockito.verify(repository).create(product);
     }
+
+    // ===== FIND ALL =====
 
     @Test
     void findAll_shouldReturnTwoProducts() {
@@ -73,6 +85,8 @@ class ProductServiceImplTest {
         assertTrue(result.contains(p2), "Product list should contain second product");
     }
 
+    // ===== FIND BY ID =====
+
     @Test
     void findById_shouldReturnCorrectProduct() {
         UUID id = UUID.randomUUID();
@@ -85,6 +99,8 @@ class ProductServiceImplTest {
         assertEquals(product, result, "Returned product should match repository result");
     }
 
+    // ===== UPDATE =====
+
     @Test
     void update_shouldCallRepositoryUpdate() {
         Product product = new Product();
@@ -93,6 +109,8 @@ class ProductServiceImplTest {
 
         Mockito.verify(repository).update(product);
     }
+
+    // ===== DELETE =====
 
     @Test
     void deleteById_shouldCallRepositoryDelete() {
