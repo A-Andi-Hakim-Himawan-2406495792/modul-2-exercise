@@ -25,17 +25,17 @@ class ProductServiceImplTest {
     private ProductServiceImpl service;
 
     @Test
-    void testCreate() {
+    void create_shouldReturnSameProduct() {
         Product product = new Product();
 
         Product result = service.create(product);
 
-        assertEquals(product, result);
+        assertEquals(product, result, "Service should return created product");
         Mockito.verify(repository).create(product);
     }
 
     @Test
-    void testFindAll() {
+    void findAll_shouldReturnTwoProducts() {
         Product p1 = new Product();
         Product p2 = new Product();
 
@@ -44,13 +44,37 @@ class ProductServiceImplTest {
 
         List<Product> result = service.findAll();
 
-        assertEquals(2, result.size());
-        assertTrue(result.contains(p1));
-        assertTrue(result.contains(p2));
+        assertEquals(2, result.size(), "Product list size should be 2");
     }
 
     @Test
-    void testFindById() {
+    void findAll_shouldContainFirstProduct() {
+        Product p1 = new Product();
+        Product p2 = new Product();
+
+        Iterator<Product> iterator = List.of(p1, p2).iterator();
+        Mockito.when(repository.findAll()).thenReturn(iterator);
+
+        List<Product> result = service.findAll();
+
+        assertTrue(result.contains(p1), "Product list should contain first product");
+    }
+
+    @Test
+    void findAll_shouldContainSecondProduct() {
+        Product p1 = new Product();
+        Product p2 = new Product();
+
+        Iterator<Product> iterator = List.of(p1, p2).iterator();
+        Mockito.when(repository.findAll()).thenReturn(iterator);
+
+        List<Product> result = service.findAll();
+
+        assertTrue(result.contains(p2), "Product list should contain second product");
+    }
+
+    @Test
+    void findById_shouldReturnCorrectProduct() {
         UUID id = UUID.randomUUID();
         Product product = new Product();
 
@@ -58,11 +82,11 @@ class ProductServiceImplTest {
 
         Product result = service.findById(id);
 
-        assertEquals(product, result);
+        assertEquals(product, result, "Returned product should match repository result");
     }
 
     @Test
-    void testUpdate() {
+    void update_shouldCallRepositoryUpdate() {
         Product product = new Product();
 
         service.update(product);
@@ -71,7 +95,7 @@ class ProductServiceImplTest {
     }
 
     @Test
-    void testDeleteById() {
+    void deleteById_shouldCallRepositoryDelete() {
         UUID id = UUID.randomUUID();
 
         service.deleteById(id);

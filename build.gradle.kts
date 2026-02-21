@@ -1,30 +1,9 @@
-import org.gradle.api.plugins.quality.Pmd
-import org.gradle.api.plugins.quality.PmdExtension
-
-configure<PmdExtension> {
-	toolVersion = "7.0.0-rc4"
-	isConsoleOutput = true
-	isIgnoreFailures = false
-	ruleSets = listOf("category/java/bestpractices.xml")
-}
-
-tasks.withType<Pmd>().configureEach {
-	reports {
-		xml.required.set(true)
-		html.required.set(true)
-	}
-}
-
-val seleniumJavaVersion = "4.14.1"
-val seleniumJupiterVersion = "5.0.1"
-val webdrivermanagerVersion = "5.6.3"
-val junitJupiterVersion = "5.9.1"
 plugins {
 	java
 	jacoco
 	id("org.springframework.boot") version "3.5.10"
 	id("io.spring.dependency-management") version "1.1.7"
-	id("pmd")
+	pmd
 }
 
 group = "id.ac.ui.cs.advprog"
@@ -33,70 +12,61 @@ description = "eshop"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+		languageVersion.set(JavaLanguageVersion.of(21))
 	}
 }
 
-configurations {
-	compileOnly {
-		extendsFrom(configurations.annotationProcessor.get())
-	}
+tasks.withType<JavaCompile>().configureEach {
+	options.release.set(17)
 }
 
 repositories {
 	mavenCentral()
 }
 
+val seleniumJavaVersion = "4.14.1"
+val seleniumJupiterVersion = "5.0.1"
+val webdrivermanagerVersion = "5.6.3"
+val junitJupiterVersion = "5.9.1"
+
+
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+
 	compileOnly("org.projectlombok:lombok")
-	developmentOnly("org.springframework.boot:spring-boot-devtools")
-	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	annotationProcessor("org.projectlombok:lombok")
+	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+
+	developmentOnly("org.springframework.boot:spring-boot-devtools")
+
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.seleniumhq.selenium:selenium-java:$seleniumJavaVersion")
+	testImplementation("io.github.bonigarcia:selenium-jupiter:$seleniumJupiterVersion")
+	testImplementation("io.github.bonigarcia:webdrivermanager:$webdrivermanagerVersion")
+	testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
+
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-	testImplementation("org.seleniumhq.selenium:selenium-java:${seleniumJavaVersion}")
-	testImplementation("io.github.bonigarcia:selenium-jupiter:${seleniumJupiterVersion}")
-	testImplementation("io.github.bonigarcia:webdrivermanager:${webdrivermanagerVersion}")
-	testImplementation("org.junit.jupiter:junit-jupiter:${junitJupiterVersion}")
 }
 
-tasks.withType<Test> {
-	useJUnitPlatform()
-}
-// Mendaftarkan task untuk Unit Test (mengecualikan FunctionalTest)
-tasks.register<Test>("unitTest") {
-	description = "Runs unit tests."
-	group = "verification"
-
-	filter {
-		excludeTestsMatching("*FunctionalTest")
-	}
-}
-
-// Mendaftarkan task untuk Functional Test (hanya menjalankan FunctionalTest)
-tasks.register<Test>("functionalTest") {
-	description = "Runs functional tests."
-	group = "verification"
-
-	filter {
-		includeTestsMatching("*FunctionalTest")
-	}
-}
-
-// Konfigurasi agar semua tes menggunakan JUnit Platform
 tasks.withType<Test>().configureEach {
 	useJUnitPlatform()
 }
 
 tasks.test {
-	useJUnitPlatform()
-
-	// exclude functional tests
 	exclude("**/*FunctionalTest*")
-
 	finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.register<Test>("functionalTest") {
+	description = "Runs functional tests"
+	group = "verification"
+	useJUnitPlatform()
+	include("**/*FunctionalTest*")
+}
+
+jacoco {
+	toolVersion = "0.8.11"
 }
 
 tasks.jacocoTestReport {
@@ -104,10 +74,18 @@ tasks.jacocoTestReport {
 	reports {
 		xml.required.set(true)
 		html.required.set(true)
-		csv.required.set(false)	}
+		csv.required.set(false)
+	}
 }
-jacoco {
-	toolVersion = "0.8.11"
+pmd {
+	toolVersion = "7.0.0-rc4"
+	isConsoleOutput = true
+	isIgnoreFailures = false
+	ruleSets = listOf("category/java/bestpractices.xml")
 }
-
-
+tasks.withType<Pmd>().configureEach {
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+	}
+}
