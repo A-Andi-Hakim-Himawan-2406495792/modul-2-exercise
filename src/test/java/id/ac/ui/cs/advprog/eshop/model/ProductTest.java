@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ProductTest {
 
@@ -24,16 +24,28 @@ class ProductTest {
 
     @Test
     void testGetProductId() {
-        assertEquals(productId, product.getProductId());
+        assertEquals(
+                productId,
+                product.getProductId(),
+                "Product ID getter should return correct UUID"
+        );
     }
 
     @Test
     void testGetProductName() {
-        assertEquals("Sampo Cap Bambang", product.getProductName());
+        assertEquals(
+                "Sampo Cap Bambang",
+                product.getProductName(),
+                "Product name getter should return correct name"
+        );
     }
 
     @Test
     void testGetProductQuantity() {
-        assertEquals(100, product.getProductQuantity());
+        assertEquals(
+                100,
+                product.getProductQuantity(),
+                "Product quantity getter should return correct quantity"
+        );
     }
 }

@@ -11,13 +11,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ExtendWith(SeleniumJupiter.class)
 class CreateProductFunctionalTest {
+
     @LocalServerPort
     private int serverPort;
 
@@ -32,31 +32,30 @@ class CreateProductFunctionalTest {
     }
 
     @Test
-    void createProduct_isCorrect(ChromeDriver driver) throws Exception {
-        // 1. Buka halaman create product
+    void createProduct_isCorrect(ChromeDriver driver) {
+        // 1. Open create page
         driver.get(baseUrl + "/product/create");
 
-        // 2. Isi Form
-        // Mencari elemen berdasarkan ID yang digenerate oleh th:field="*{productName}"
+        // 2. Fill form
         WebElement nameInput = driver.findElement(By.id("productName"));
         nameInput.clear();
         nameInput.sendKeys("Sampo Cap Selenium");
 
-        // Mencari elemen berdasarkan ID yang digenerate oleh th:field="*{productQuantity}"
         WebElement quantityInput = driver.findElement(By.id("productQuantity"));
         quantityInput.clear();
         quantityInput.sendKeys("20");
 
-        // 3. Klik Tombol Submit
-        // Mencari tombol berdasarkan tipe dan class
+        // 3. Submit
         WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
         submitButton.click();
 
-        // 4. Verifikasi Hasil
-        // Pastikan kita sudah berpindah halaman (misal ke Product List)
-        // Kita cek apakah produk yang baru dibuat muncul di halaman list
+        // 4. Verification (1 assert only)
         String pageSource = driver.getPageSource();
-        assertTrue(pageSource.contains("Sampo Cap Selenium"));
-        assertTrue(pageSource.contains("20"));
+
+        assertTrue(
+                pageSource.contains("Sampo Cap Selenium") &&
+                        pageSource.contains("20"),
+                "Created product name and quantity should appear on product list page"
+        );
     }
 }

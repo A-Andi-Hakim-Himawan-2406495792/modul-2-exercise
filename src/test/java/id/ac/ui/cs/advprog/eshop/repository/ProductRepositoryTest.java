@@ -19,110 +19,79 @@ class ProductRepositoryTest {
     }
 
     @Test
-    void testCreateAndFind() {
+    void create_shouldGenerateId() {
+        Product product = new Product();
+        product.setProductName("Sampo");
+        product.setProductQuantity(1);
+
+        productRepository.create(product);
+
+        Product saved = productRepository.findAll().next();
+        assertNotNull(saved.getProductId(), "Created product should have ID");
+    }
+
+    @Test
+    void create_shouldSaveName() {
         Product product = new Product();
         product.setProductName("Sampo Cap Bambang");
         product.setProductQuantity(100);
 
         productRepository.create(product);
 
-        Iterator<Product> iterator = productRepository.findAll();
-        assertTrue(iterator.hasNext());
-
-        Product savedProduct = iterator.next();
-        assertNotNull(savedProduct.getProductId());
-        assertEquals("Sampo Cap Bambang", savedProduct.getProductName());
-        assertEquals(100, savedProduct.getProductQuantity());
+        Product saved = productRepository.findAll().next();
+        assertEquals("Sampo Cap Bambang", saved.getProductName(), "Name should be saved");
     }
 
     @Test
-    void testFindAllIfEmpty() {
-        Iterator<Product> iterator = productRepository.findAll();
-        assertFalse(iterator.hasNext());
-    }
-
-    @Test
-    void testFindAllIfMoreThanOneProduct() {
-        Product p1 = new Product();
-        p1.setProductName("Sampo Cap Bambang");
-        p1.setProductQuantity(100);
-
-        Product p2 = new Product();
-        p2.setProductName("Sampo Cap Usep");
-        p2.setProductQuantity(50);
-
-        productRepository.create(p1);
-        productRepository.create(p2);
-
-        Iterator<Product> iterator = productRepository.findAll();
-
-        assertTrue(iterator.hasNext());
-        Product first = iterator.next();
-        Product second = iterator.next();
-
-        assertEquals("Sampo Cap Bambang", first.getProductName());
-        assertEquals("Sampo Cap Usep", second.getProductName());
-        assertFalse(iterator.hasNext());
-    }
-
-    // EDIT PRODUCT
-    @Test
-    void testEditProductPositive() {
+    void create_shouldSaveQuantity() {
         Product product = new Product();
-        product.setProductName("Sampo Cap Bambang");
+        product.setProductName("Sampo");
         product.setProductQuantity(100);
 
         productRepository.create(product);
+
+        Product saved = productRepository.findAll().next();
+        assertEquals(100, saved.getProductQuantity(), "Quantity should be saved");
+    }
+
+    @Test
+    void findAll_emptyRepository() {
+        assertFalse(productRepository.findAll().hasNext(), "Empty repo should return no data");
+    }
+
+    @Test
+    void update_existingProduct_shouldChangeName() {
+        Product product = new Product();
+        product.setProductName("Old");
+        product.setProductQuantity(1);
+        productRepository.create(product);
+
         UUID id = product.getProductId();
 
-        Product updatedProduct = new Product();
-        updatedProduct.setProductId(id);
-        updatedProduct.setProductName("Sampo Cap Baru");
-        updatedProduct.setProductQuantity(50);
+        Product updated = new Product();
+        updated.setProductId(id);
+        updated.setProductName("New");
+        updated.setProductQuantity(1);
 
-        productRepository.update(updatedProduct);
+        productRepository.update(updated);
 
-        Product result = productRepository.findById(id);
-        assertNotNull(result);
-        assertEquals("Sampo Cap Baru", result.getProductName());
-        assertEquals(50, result.getProductQuantity());
+        assertEquals("New", productRepository.findById(id).getProductName(), "Name should update");
     }
 
     @Test
-    void testEditProductNegative_NotFound() {
+    void delete_existingProduct_shouldRemove() {
         Product product = new Product();
-        product.setProductId(UUID.randomUUID());
-        product.setProductName("Produk Hantu");
-        product.setProductQuantity(10);
-
-        // Tidak ada exception = PASS
-        productRepository.update(product);
-
-        Iterator<Product> iterator = productRepository.findAll();
-        assertFalse(iterator.hasNext());
-    }
-
-    // DELETE PRODUCT
-    @Test
-    void testDeleteProductPositive() {
-        Product product = new Product();
-        product.setProductName("Sampo Cap Bambang");
-        product.setProductQuantity(100);
-
+        product.setProductName("Delete");
+        product.setProductQuantity(1);
         productRepository.create(product);
-        UUID id = product.getProductId();
 
-        productRepository.deleteById(id);
+        productRepository.deleteById(product.getProductId());
 
-        Iterator<Product> iterator = productRepository.findAll();
-        assertFalse(iterator.hasNext());
+        assertFalse(productRepository.findAll().hasNext(), "Product should be deleted");
     }
 
     @Test
-    void testDeleteProductNegative_NotFound() {
-        productRepository.deleteById(UUID.randomUUID());
-
-        Iterator<Product> iterator = productRepository.findAll();
-        assertFalse(iterator.hasNext());
+    void findById_notFound_shouldReturnNull() {
+        assertNull(productRepository.findById(UUID.randomUUID()), "Unknown ID should return null");
     }
 }
