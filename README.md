@@ -172,3 +172,45 @@ Menurut saya, implementasi GitHub Actions yang ada sudah memenuhi definisi *Cont
 
 Dari sisi CD, saya sudah menghubungkan repository ke PaaS sehingga setiap perubahan yang masuk ke `main` akan otomatis men-*trigger build* Docker dan *deployment* aplikasi tanpa perlu intervensi manual. Dengan begitu, saya benar-benar tidak perlu lagi *build* dan *deploy* dari laptop sendiri setiap kali ada pembaruan.
 
+---
+
+# Reflection – Module 03: OO Principles & Software Maintainability
+
+Refleksi ini ditulis berdasarkan pengalaman melakukan *refactoring* pada proyek **Spring Boot EShop** (branch `after-solid`) untuk menerapkan prinsip-prinsip **SOLID** dan meningkatkan kualitas serta kemudahan pemeliharaan (*Software Maintainability*).
+
+## 1. Prinsip SOLID yang Diterapkan pada Proyek
+
+Selama pengerjaan tutorial dan *exercise*, saya menerapkan kelima prinsip SOLID untuk memperbaiki struktur kode yang sebelumnya sengaja digabung dan melanggar praktik desain yang baik.
+
+* **Single Responsibility Principle (SRP):**
+  Saya memisahkan `CarController` yang awalnya menumpang di dalam file `ProductController.java` menjadi file tersendiri (`CarController.java`). Dengan ini, `ProductController` hanya bertanggung jawab untuk mengelola *routing* produk, sedangkan `CarController` memiliki tanggung jawab tunggal khusus untuk entitas mobil.
+* **Open-Closed Principle (OCP):**
+  Penerapan *interface* `CarService` membuat sistem lebih terbuka untuk ekstensi (*open for extension*) namun tertutup untuk modifikasi (*closed for modification*). Jika ke depannya ada implementasi baru (misalnya `CarServiceDatabaseImpl`), saya cukup membuat *class* baru yang mengimplementasikan *interface* tersebut tanpa perlu mengubah isi dari `CarController`.
+* **Liskov Substitution Principle (LSP):**
+  Saya menghapus *keyword* `extends ProductController` pada `CarController`. Sebelumnya, pewarisan ini melanggar LSP karena `CarController` bukanlah substitusi yang valid dari `ProductController`. Memaksakan *inheritance* di sini hanya akan mengacaukan hierarki dan menyebabkan *routing* aplikasi menjadi tidak konsisten.
+* **Interface Segregation Principle (ISP):**
+  *Interface* `CarService` sudah dipisahkan dan didesain agar hanya mendefinisikan *method* yang benar-benar relevan dengan entitas *Car* (`create`, `findAll`, `findById`, `update`, `deleteCarById`). *Client* (dalam hal ini *controller*) tidak dipaksa untuk mengimplementasikan atau bergantung pada *method* yang tidak mereka butuhkan.
+* **Dependency Inversion Principle (DIP):**
+  Pada `CarController`, saya mengubah cara injeksi dependensi agar bergantung pada abstraksi (*interface* `CarService`) alih-alih pada implementasi konkret (`CarServiceImpl`).
+
+---
+
+## 2. Keuntungan Menerapkan Prinsip SOLID
+
+Penerapan prinsip SOLID memberikan dampak positif yang langsung terasa pada *codebase*, antara lain:
+
+* **Meningkatkan *Maintainability* dan Keterbacaan Kode:** Dengan memecah kelas yang memonopoli banyak tugas (berkat SRP), kode menjadi lebih terstruktur. Saat ada *bug* atau fitur baru di modul *Car*, saya tahu persis harus membuka `CarController` tanpa terdistraksi oleh ratusan baris kode milik `Product`.
+* **Mempermudah Pengembangan Masa Depan (Fleksibilitas):** Berkat DIP dan OCP, layer *Controller* dan *Service* menjadi *loosely coupled* (tidak terlalu bergantung satu sama lain). Mengubah cara kerja di *Service* tidak akan merusak atau mengharuskan saya menulis ulang kode di *Controller*.
+* **Mencegah Perilaku Tak Terduga (*Unexpected Behavior*):** Memperbaiki LSP dengan menghapus *inheritance* yang salah mencegah `CarController` secara tidak sengaja mewarisi *endpoint* URL milik `ProductController`, sehingga aplikasi berjalan lebih aman dan terprediksi.
+
+---
+
+## 3. Kerugian Jika Tidak Menerapkan Prinsip SOLID
+
+Sebaliknya, jika kode dibiarkan berantakan seperti pada branch `before-solid`, ada beberapa kerugian besar yang akan menyulitkan di masa depan:
+
+* **Terbentuknya *God Object* (Kode Monolitik):** Mengabaikan SRP akan membuat file `ProductController.java` membengkak dan menangani terlalu banyak hal. Hal ini membuat kode sulit dibaca, memakan waktu lama saat *code review*, dan sangat rawan *merge conflict* jika dikerjakan bersama tim.
+* **Sistem Menjadi Kaku (*Tightly Coupled*):** Tanpa DIP (bergantung langsung pada *concrete class* `CarServiceImpl`), setiap ada perubahan radikal pada implementasi *service*, kita wajib merombak isi *controller* juga. Hal ini juga menyulitkan proses *unit testing* karena kita tidak bisa membuat *mock* (objek tiruan) dari *interface* dengan mudah.
+* **Risiko Kerusakan Skala Besar (*Ripple Effect*):** Melanggar OCP berarti untuk menambah fungsionalitas baru, kita harus terus-menerus memodifikasi kode lama yang sudah berjalan stabil. Setiap modifikasi pada kode lama membawa risiko merusak fitur lain yang sudah ada (*regression bug*).
+
+---
